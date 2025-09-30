@@ -11,9 +11,9 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
-#define AUDIO_BUFFER_SIZE (1024*1024) // 1 MB di buffer (regolabile)
+#define AUDIO_BUFFER_SIZE (1024*1024) // 1 MB audio buffer
 
-// ring buffer per l’audio
+// ring buffer audio
 typedef struct {
     unsigned char data[AUDIO_BUFFER_SIZE];
     size_t read_pos;
@@ -62,7 +62,7 @@ static void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
 
     size_t got = rb_read(state->rb, out, bytesToWrite);
     if(got < bytesToWrite){
-        // buffer vuoto -> completa con silenzio
+        // empty buffer -> complete with silence
         memset(out+got, 0, bytesToWrite-got);
     }
 
@@ -117,7 +117,7 @@ int main(int argc, char **argv){
     SDL_Renderer *ren=SDL_CreateRenderer(win,NULL);
     SDL_Texture *tex=SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, (int)w,(int)h);
 
-    // init audio con Miniaudio
+    // init audio
     RingBuffer rb;
     rb_init(&rb);
     AudioState state={.rb=&rb};
@@ -144,13 +144,13 @@ int main(int argc, char **argv){
 
     int running=1;
     while(running){
-        // eventi
+        // events
         SDL_Event ev;
         while(SDL_PollEvent(&ev)){
             if(ev.type==SDL_EVENT_QUIT) running=0;
             if(ev.type==SDL_EVENT_KEY_DOWN){
                 if(ev.key.key==SDLK_ESCAPE || ev.key.key==SDLK_Q) running=0;
-                else if(ev.key.key ==SDLK_E) ConvertToAvi(movie);
+                else if(ev.key.key ==SDLK_E) ConvertToAvi(argv[1]);
             }
         }
 
@@ -170,7 +170,7 @@ int main(int argc, char **argv){
             SDL_RenderPresent(ren);
         }
 
-        // accoda audio nel ring buffer
+        // queue audio in the ring buffer
         const unsigned char *chunk = smk_get_audio(movie,track);
         unsigned long size = smk_get_audio_size(movie,track);
         if(chunk && size>0){

@@ -3,5 +3,5 @@
 
 #include <stdio.h>
 
-void ConvertToAvi(smk movie);
+void ConvertToAvi(const char *fn);
 #endif

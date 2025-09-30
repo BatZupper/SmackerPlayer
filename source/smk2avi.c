@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "smacker.h"
-#include "smk2avi.h"
 
 #define w(p,n) fwrite(p,1,n,fp)
 
@@ -25,10 +24,10 @@
 	w(b,2); \
 }
 
-void ConvertToAvi(smk movie)
+void ConvertToAvi(const char *fn)
 {
 	FILE *fp = NULL;
-	smk s = movie;
+	smk s;
 	char outfile[256];
 	unsigned char b[5];
 
@@ -55,7 +54,10 @@ void ConvertToAvi(smk movie)
 
 	unsigned long cur_frame;
 
-	printf("--------\nsmk2avi processing %s...\n");
+	printf("--------\nsmk2avi processing %s...\n",fn);
+
+	/* open the smk file */
+	s = smk_open_file(fn,SMK_MODE_DISK);
 	if (s == NULL) goto error;
 
 	/* get some info about the file */
@@ -106,7 +108,7 @@ void ConvertToAvi(smk movie)
 
 	smk_enable_all(s,SMK_VIDEO_TRACK);
 
-	sprintf(outfile,"%s.avi");
+	sprintf(outfile,"%s.avi",fn);
 
 	fp = fopen(outfile,"wb");
 
